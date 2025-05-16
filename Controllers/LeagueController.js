@@ -240,7 +240,7 @@ const createMatch = async (req, res) => {
           const user = await User.findById(player.user._id);
           user.goals.total += goalCount;
           user.goals.weekly.push({
-            match: weeklyMatch._id,
+            matchId: weeklyMatch._id,
             goals: goalCount
           });
           await user.save();
@@ -248,7 +248,7 @@ const createMatch = async (req, res) => {
           for (let i = 0; i < goalCount; i++) {
             weeklyMatch.goals.push({
               scorer: player.user._id,
-              team: 'team2'
+              team: 'team2' 
             });
           }
         }
