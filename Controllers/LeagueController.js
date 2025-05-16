@@ -316,6 +316,24 @@ const createMatch = async (req, res) => {
 };
   
 
+const getAddMatchPage = async (req, res) => {
+  try {
+    const ligId = req.params.id;
+    const lig = await Lig.findById(ligId).populate('members'); // üyeleri getir
+
+    if (!lig) {
+      return res.status(404).send('Lig bulunamadı');
+    }
+
+    res.render('MacEkle', {
+      lig,                // tüm lig objesini geçebilirsin
+      members: lig.members // veya sadece üyeleri doğrudan da geçebilirsin
+    });
+  } catch (err) {
+    console.error('Sayfa yüklenirken hata oluştu:', err);
+    res.status(500).send('Bir hata oluştu.');
+  }
+};
 
 
 
@@ -324,5 +342,4 @@ const createMatch = async (req, res) => {
 
 
 
-
-export { createLeague , joinLeague  , createMatch , enterResults , editLeague};
+export { createLeague , joinLeague  , createMatch , enterResults , editLeague , getAddMatchPage};
