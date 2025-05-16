@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Hesap Doğrulama</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .navbar {
+            background-color: #007bff;
+            padding: 15px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .navbar .left,
+        .navbar .right {
+            display: flex;
+            align-items: center;
+        }
+        .navbar input[type="text"] {
+            padding: 5px;
+            margin-left: 20px;
+            border: none;
+            border-radius: 3px;
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .verify-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+        .verify-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .verify-container input[type="email"],
+        .verify-container input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .verify-container button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .verify-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="left">
+            <a href="/">Ana Sayfa</a>
+            <a href="/lig-olustur">Lig Oluştur</a>
+            <a href="/lige-katil">Lig'e Katıl</a>
+        </div>
+        <div class="right">
+            <a href="/UyeGirisi">Üye Girişi</a>
+            <a href="/UyeOl">Üye Ol</a>
+            <input type="text" placeholder="Arama..." />
+        </div>
+    </div>
+    <div class="container">
+        <div class="verify-container">
+            <h2>Hesap Doğrulama</h2>
+            <form id="verifyForm" action="/verify" method="POST">
+                <input type="email" name="email" placeholder="E-posta" required /><br />
+                <input type="text" name="code" placeholder="Doğrulama Kodu" required /><br />
+                <button type="submit">Doğrula</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

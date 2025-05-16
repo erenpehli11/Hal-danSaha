@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Üye Girişi</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #1ABC9C, #3498DB, #9B59B6);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .navbar {
+            background-color: rgba(44, 62, 80, 0.9);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 1.2em;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #E74C3C;
+        }
+
+        .navbar a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #E74C3C;
+            left: 0;
+            bottom: -5px;
+            transition: width 0.3s;
+        }
+
+        .navbar a:hover::after {
+            width: 100%;
+        }
+
+        .navbar .left, .navbar .right {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar input[type="text"] {
+            padding: 8px;
+            margin-left: 20px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 350px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-container h2 {
+            margin-bottom: 25px;
+            color: #2C3E50;
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        .login-container input[type="email"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        .login-container button {
+            background-color: #1ABC9C;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .login-container button:hover {
+            background-color: #16A085;
+        }
+
+        .login-container .signup-link {
+            margin-top: 20px;
+            display: block;
+            color: #3498DB;
+            font-size: 1em;
+            text-decoration: none;
+        }
+
+        .login-container .signup-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="left">
+            <a href="/">Ana Sayfa</a>
+            <a href="/UyeGirisi">Lig Oluştur</a>
+            <a href="/UyeGirisi">Lig'e Katıl</a>
+        </div>
+        <div class="right">
+            <a href="/UyeGirisi">Üye Girişi</a>
+            <a href="/UyeOl">Üye Ol</a>
+            <input type="text" placeholder="Arama...">
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="login-container">
+            <h2>Üye Girişi</h2>
+            <form id="loginForm" action="/UyeGirisi" method="POST">
+                <input type="email" id="email" name="email" placeholder="E-posta" required>
+                <input type="password" id="password" name="password" placeholder="Şifre" required>
+                <button type="submit">Giriş Yap</button>
+            </form>
+            <a href="/UyeOl" class="signup-link">Üye değil misiniz? Kayıt olun</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Üye Ol</title>
+    <style>
+        /* Önceki style'lar buraya gelecek (daha öncekiyle uyumlu) */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .navbar {
+            background-color: #007bff;
+            padding: 15px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .navbar .left,
+        .navbar .right {
+            display: flex;
+            align-items: center;
+        }
+        .navbar input[type="text"] {
+            padding: 5px;
+            margin-left: 20px;
+            border: none;
+            border-radius: 3px;
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .signup-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 300px;
+            text-align: center;
+        }
+        .signup-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .signup-container input[type="text"],
+        .signup-container input[type="email"],
+        .signup-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .signup-container button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .signup-container button:hover {
+            background-color: #0056b3;
+        }
+        .signup-container .login-link {
+            margin-top: 15px;
+            display: block;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .signup-container .login-link:hover {
+            text-decoration: underline;
+        }
+        .info-text {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="left">
+            <a href="/">Ana Sayfa</a>
+            <a href="/lig-olustur">Lig Oluştur</a>
+            <a href="/lige-katil">Lig'e Katıl</a>
+        </div>
+        <div class="right">
+            <a href="/UyeGirisi">Üye Girişi</a>
+            <a href="/UyeOl">Üye Ol</a>
+            <input type="text" placeholder="Arama...">
+        </div>
+    </div>
+    <div class="container">
+        <div class="signup-container">
+            <h2>Üye Ol</h2>
+            <form id="signupForm">
+                <input type="text" id="name" name="name" placeholder="İsim" required><br>
+                <input type="text" id="surname" name="surname" placeholder="Soyisim" required><br>
+                <input type="email" id="email" name="email" placeholder="E-posta" required><br>
+
+                <input type="password" id="password" name="password" placeholder="Şifre" required><br>
+                <div class="info-text">
+                    Şifre en az 8 karakter, bir büyük harf ve bir sayı içermelidir.
+                </div>
+
+                <div id="error" class="error-message" style="display:none;"></div>
+
+                <!-- Doğrulama kodu inputu, başlangıçta gizli -->
+                <input type="text" id="verificationCode" name="verificationCode" placeholder="E-posta doğrulama kodu" style="display:none;"><br>
+
+                <button type="submit" id="submitBtn">Kayıt Ol</button>
+            </form>
+            <a href="/UyeGirisi" class="login-link">Zaten üye misiniz? Giriş yapın</a>
+        </div>
+    </div>
+
+<script>
+    const form = document.getElementById('signupForm');
+    const passwordInput = document.getElementById('password');
+    const errorDiv = document.getElementById('error');
+    const verificationCodeInput = document.getElementById('verificationCode');
+    const submitBtn = document.getElementById('submitBtn');
+    let isCodeSent = false;
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const name = document.getElementById('name').value.trim();
+        const surname = document.getElementById('surname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = passwordInput.value.trim();
+        const verificationCode = verificationCodeInput.value.trim();
+
+        // Şifre validasyonu
+        const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = 'Şifre en az 8 karakter, bir büyük harf ve bir sayı içermelidir.';
+            return;
+        } else {
+            errorDiv.style.display = 'none';
+        }
+
+        // Doğrulama kodu gönderilmemişse önce kod gönder
+        if (!isCodeSent) {
+            fetch('/send-verification-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, surname, email, password }),
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message?.includes("Doğrulama kodu e-postanıza gönderildi")) {
+    isCodeSent = true;
+
+    verificationCodeInput.style.display = 'block';
+    verificationCodeInput.setAttribute('required', true); // <--- Burası önemli
+
+    submitBtn.textContent = 'Doğrula ve Kayıt Ol';
+    errorDiv.style.display = 'none';
+}else {
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = data.message || 'Doğrulama kodu gönderilirken hata oluştu.';
+                }
+            })
+            .catch(() => {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Doğrulama kodu gönderilirken hata oluştu.';
+            });
+            return;
+        }
+
+        // Kod gönderildiyse ve kullanıcı kodu girdiyse verify-code endpoint'ine gönder
+        if (isCodeSent && verificationCode !== '') {
+            fetch('/verify-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, code: verificationCode }),
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message?.includes("Kayıt başarılı")) {
+                    alert("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz.");
+                    window.location.href = "/UyeGirisi"; // Kayıt sonrası yönlendirme
+                } else {
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = data.message || 'Doğrulama başarısız.';
+                }
+            })
+            .catch(() => {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Sunucuya bağlanırken hata oluştu.';
+            });
+        } else {
+            errorDiv.style.display = 'block';
+            errorDiv.textContent = 'Lütfen e-posta doğrulama kodunu giriniz.';
+        }
+    });
+</script>
+</body>
+</html>

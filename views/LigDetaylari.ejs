@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= lig.name %> - Lig Detayları</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+   <style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+    }
+
+    nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: #2c3e50;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000; /* üstte kalsın */
+        height: 40px; /* navbar yüksekliği */
+    }
+
+    nav a {
+        color: white;
+        text-decoration: none;
+        margin-left: 20px;
+        font-weight: bold;
+    }
+
+    nav a:hover {
+        text-decoration: underline;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 50px auto 40px auto; /* navbar 70px, biraz da boşluk */
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        font-size: 36px;
+        text-align: center;
+        color: #2c3e50;
+        font-family: 'Arial', sans-serif;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        margin-top: 40px;
+        font-size: 26px;
+        color: #2c3e50;
+    }
+
+    .admin-buttons {
+        margin-top: 40px;
+        display: flex;
+        gap: 15px;
+        position: absolute;
+        top: 60px;
+        right: 250px;
+    }
+
+    .admin-buttons button {
+        background-color: #1abc9c;
+        color: white;
+        border: none;
+        padding: 12px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .admin-buttons button:hover {
+        background-color: #16a085;
+    }
+
+    /* Tabs container'ı aşağı taşıyoruz */
+    .tabs {
+        margin-top: 30px;
+        display: flex;
+        gap: 10px;
+        position: absolute;
+        top: 160px; /* burayı isteğine göre değiştir */
+        right: 250px;
+    }
+
+    /* margin-top KALDIRILDI */
+    .tab-button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.2s;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .tab-button:hover {
+        background-color: #2980b9;
+    }
+
+    .tab-content {
+        margin-top: 20px;
+    }
+
+    ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    li {
+        margin-bottom: 12px;
+        font-size: 18px;
+        font-weight: 500;
+        color: #34495e;
+    }
+
+    .match-card {
+        background-color: #ecf0f1;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+
+    .teams {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    .teams > div {
+        width: 48%;
+    }
+
+    .team-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+
+    .team-container .team-box {
+        width: 48%;
+        padding: 20px;
+        border-radius: 12px;
+        background-color: #ecf0f1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .team-box h3 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #2c3e50;
+    }
+
+    .team-box ul {
+        padding-left: 0;
+        list-style: none;
+    }
+
+    .team-box li {
+        margin-bottom: 10px;
+    }
+
+    .match-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    /* ------------------ MODAL ------------------ */
+    .modal {
+        display: none; /* Başlangıçta gizli */
+        position: fixed;
+        z-index: 10000; /* Diğer öğelerden önde */
+        left: 0;
+        top: 0;
+        width: 100%; /* Tam ekran genişliği */
+        height: 100%; /* Tam ekran yüksekliği */
+        background-color: rgba(0, 0, 0, 0.5); /* Yarı saydam koyu arka plan */
+        padding-top: 60px; /* Üstten boşluk */
+        overflow: auto; /* İçerik taşarsa kaydır */
+    }
+
+    /* Modal içeriğinin stili */
+    .modal-content {
+        background-color: #fefefe;
+        margin: 80px auto; /* Ortada konumlandırma */
+        padding: 20px 30px;
+        border: 1px solid #888;
+        border-radius: 12px;
+        width: 400px;
+        max-width: 95%;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        position: relative;
+    }
+
+    /* Kapatma butonunun stili */
+    .close {
+        position: absolute;
+        top: 12px;
+        right: 18px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #666;
+        transition: color 0.2s ease;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+    }
+
+    .modal h2 {
+        margin-top: 0;
+        color: #2c3e50;
+    }
+
+    .member-remove {
+        cursor: pointer;
+        color: red;
+        margin-left: 8px;
+        font-weight: 700;
+    }
+
+    .member-item {
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal button.save-btn {
+        background-color: #1abc9c;
+        border: none;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 15px;
+        width: 100%;
+        transition: background-color 0.3s ease;
+    }
+
+    .modal button.save-btn:hover {
+        background-color: #16a085;
+    }
+
+    /* -------------------------------------------- */
+
+    .member-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .member-card {
+        background: linear-gradient(135deg, #f0f0f0, #ffffff);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .member-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+
+    .member-avatar {
+        font-size: 32px;
+        margin-right: 12px;
+        color: #6c63ff;
+    }
+
+    .member-name {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .weeklyMatch-card {
+        background: #f9f9f9;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .weeklyMatch-card:hover {
+        transform: scale(1.02);
+    }
+
+    .weeklyMatch-card h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .match-detail-btn {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 16px;
+        background-color: #198754;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .match-detail-btn:hover {
+        background-color: #146c43;
+    }
+
+    .stats-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .stats-column {
+        width: 48%;
+    }
+
+    .stats-column table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .stats-column th {
+        background-color: #4CAF50;
+        color: white;
+        cursor: pointer;
+        padding: 10px;
+    }
+
+    .stats-column td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+    }
+
+    .stats-column tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div><a href="/AnaSayfa">Ana Sayfa</a>
+        <a href="/Liglerim">Liglerim</a>
+        </div>
+        <div>
+          
+           <a href="/CikisYap">Çıkış Yap</a>
+        </div>
+    </nav>
+    
+    
+
+    <div class="container">
+        <!-- Lig Adı ve Admin -->
+        <h1><%= lig.name %></h1>
+        <p>Admin: <%= lig.admin.name %> <%= lig.admin.surname %></p>
+
+        <% if (userId === lig.admin._id.toString()) { %>
+            <div class="admin-buttons">
+                <button onclick="window.location.href='/lig/<%= lig._id %>/MacEkle'">➕ Yeni Maç Ekle</button>
+                 <button id="editButton">⚙️ Düzenle</button>
+            </div>
+        <% } %>
+
+        <!-- Tab buttons -->
+        <div class="tabs">
+          
+            <button class="tab-button" onclick="showTab('fixtures')">Fikstür</button>
+            <button class="tab-button" onclick="showTab('statistics')">İstatistikler</button>
+            <button class="tab-button" onclick="showTab('members')">Kişiler</button>
+            <button class="weekly" onclick="showTab('weekly')">Haftanın Maçı</button>
+        </div>
+
+        <!-- Tab contents -->
+        <div id="fixtures" class="tab-content" style="display: none;">
+            <% weeklyMatchList.forEach(weeklyMatch => { %>
+              <div class="weeklyMatch-card">
+                <h3><%= weeklyMatch.date.toLocaleDateString('tr-TR') %></h3>
+                <a class="match-detail-btn" href="/lig/<%= lig._id %>/mac/<%= weeklyMatch._id %>">
+                  Maç Detayları
+                </a>
+              </div>
+            <% }) %>
+          </div>
+          <div id="statistics" class="tab-content" style="display: none;">
+            <div class="stats-container">
+              
+              <!-- Gol Krallığı -->
+              <div class="stats-column">
+                <h3>⚽ Gol Krallığı</h3>
+                <table id="goalStats">
+                  <thead>
+                    <tr>
+                      <th onclick="sortTable('goalStatsTable', 0)">Oyuncu</th>
+                      <th onclick="sortTable('goalStatsTable', 1)">Maç</th>
+                      <th onclick="sortTable('goalStatsTable', 2)">Gol</th>
+                      <th onclick="sortTable('goalStatsTable', 3)">Gol Ort.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% goalStats.forEach(user => { %>
+                      <tr>
+                        <td><%= user.name %></td>
+                        <td><%= user.totalMatches %></td>
+                        <td><%= user.totalGoals %></td>
+                        <td><%= (user.totalGoals / user.totalMatches).toFixed(2) %></td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+          
+              <!-- Winner Sıralaması -->
+              <div class="stats-column">
+                <h3>🏆 Winner Sıralaması</h3>
+                <table id="winnerStatsTable">
+                  <thead>
+                    <tr>
+                      <th onclick="sortTable('winnerStatsTable', 0)">Oyuncu</th>
+                      <th onclick="sortTable('winnerStatsTable', 1)">Kazanç</th>
+                      <th onclick="sortTable('winnerStatsTable', 2)">Maç</th>
+                      <th onclick="sortTable('winnerStatsTable', 3)">Oran</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% winnerStats.forEach(user => { %>
+                      <tr>
+                        <td><%= user.name %></td>
+                        <td><%= user.wins %></td>
+                        <td><%= user.matchCount %></td>
+                        <td><%= ((user.wins / user.matchCount) * 100).toFixed(1) %>%</td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        <div id="members" class="tab-content" style="display: none;">
+    <h3>Kişiler</h3>
+    <div class="member-list">
+        <% lig.members.forEach(member => { %>
+            <div class="member-card">
+                <div class="member-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="member-info">
+                    <span class="member-name"><%= member.name %> <%= member.surname %></span>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+</div>
+
+<div id="weekly" class="tab-content" >
+
+        <h2>Haftanın Maçı</h2>
+        <% if (weeklyMatch) { %>
+            <div class="match-card">
+                <div class="match-header">
+                    <h2 class="text-xl font-bold mb-2"><%= weeklyMatch.team1name %> vs <%= weeklyMatch.team2Name %></h2>
+                    <p class="text-sm text-gray-600 mb-4">Tarih: <%= weeklyMatch.date.toLocaleDateString("tr-TR") %></p>
+                </div>
+
+                <div class="team-container">
+                    <div class="team-box">
+                        <h3>Takım 1</h3>
+                        <ul>
+                            <% weeklyMatch.team1Players.forEach(p => { %>
+                                <li><%= p.user.name %></li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                    <div class="team-box">
+                        <h3>Takım 2</h3>
+                        <ul>
+                            <% weeklyMatch.team2Players.forEach(p => { %>
+                                <li><%= p.user.name %></li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        <% } else { %>
+            <p>Bu Haftaki Maçın Bilgileri Henüz Mevcut Değil</p>
+        <% } %>
+    </div>
+ 
+
+    <button id="openModal" class="btn">Sonuçları Gir</button>
+        
+        <!-- Modal -->
+        <div id="resultModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span id="closeModal" class="close">&times;</span>
+                <h3>Sonuçları Girin</h3>
+                <form action="/lig/<%= lig._id %>/sonuc-gir" method="POST">
+
+                    <% if (weeklyMatch) { %>
+                    <input type="hidden" name="matchId" value="<%= weeklyMatch._id %>">
+                    
+                    <h4>Takım 1 Golleri</h4>
+                    <% weeklyMatch.team1Players.forEach(p => { %>
+                        <label for="team1_<%= p.user._id %>"><%= p.user.name %>:</label>
+                        <input type="number" name="team1_<%= p.user._id %>" min="0" value="0"><br>
+                    <% }) %>
+                    
+                    <!-- Takım 1 Toplam Gol Sayısı -->
+                    <h4>Takım 1 Toplam Golleri</h4>
+                    <input type="number" name="team1TotalGoals" min="0" value="0"><br>
+                    
+                    <h4>Takım 2 Golleri</h4>
+                    <% weeklyMatch.team2Players.forEach(p => { %>
+                        <label for="team2_<%= p.user._id %>"><%= p.user.name %>:</label>
+                        <input type="number" name="team2_<%= p.user._id %>" min="0" value="0"><br>
+                    <% }) %>
+                    
+                    <!-- Takım 2 Toplam Gol Sayısı -->
+                    <h4>Takım 2 Toplam Golleri</h4>
+                    <input type="number" name="team2TotalGoals" min="0" value="0"><br>
+                    
+                    <button type="submit">Gönder</button>
+                    } else { %>
+  <p>Bu haftalık maç ayarlanmadığı için sonuç girişi yapılamaz.</p>
+<% } %>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="editModalClose">&times;</span>
+        <h2>Lig Düzenle</h2>
+
+        <!-- Lig adı değiştirme formu -->
+        <form id="editLeagueForm" method="POST" action="/lig/<%= lig._id %>/lig-duzenle">
+            <label for="leagueName">Lig Adı:</label>
+            <input
+                type="text"
+                id="leagueName"
+                name="name"
+                value="<%= lig.name %>"
+                required
+                style="width: 100%; padding: 8px; margin-top: 6px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ccc;"
+            />
+
+            <h3>Üyeler</h3>
+            <div id="memberList">
+                <% lig.members.forEach(member => { %>
+                    <div class="member-item" data-member-id="<%= member._id %>">
+                        <span><%= member.name %> <%= member.surname %></span>
+                        <span class="member-remove" title="Üyeyi kaldır">&times;</span>
+                    </div>
+                <% }) %>
+            </div>
+
+            <!-- hidden input ile kaldırılan üyelerin id'lerini göndereceğiz -->
+            <input type="hidden" name="removedMembers" id="removedMembers" value="[]" />
+
+            <button type="submit" class="save-btn">Kaydet</button>
+        </form>
+    </div>
+</div>
+    
+<script>
+    const editModal = document.getElementById("editModal");
+    const editButton = document.getElementById("editButton");
+    const editModalClose = document.getElementById("editModalClose");
+    const removedMembersInput = document.getElementById("removedMembers");
+    const memberList = document.getElementById("memberList");
+
+    let removedMembers = [];
+
+    editButton.onclick = () => {
+        editModal.style.display = "block";
+        removedMembers = [];
+        updateRemovedMembersInput();
+    };
+
+    editModalClose.onclick = () => {
+        editModal.style.display = "none";
+        resetRemovedMembers();
+    };
+
+    window.onclick = (event) => {
+        if (event.target === editModal) {
+            editModal.style.display = "none";
+            resetRemovedMembers();
+        }
+    };
+
+    // ✨ Delege event: yeni üyeler için de çalışır
+    memberList.addEventListener("click", function (e) {
+        if (e.target.classList.contains("member-remove")) {
+            const memberDiv = e.target.closest(".member-item");
+            const memberId = memberDiv.getAttribute("data-member-id");
+
+            if (confirm("Bu üyeyi ligden kaldırmak istediğinizden emin misiniz?")) {
+                memberDiv.remove();
+                removedMembers.push(memberId);
+                updateRemovedMembersInput();
+            }
+        }
+    });
+
+    function updateRemovedMembersInput() {
+        removedMembersInput.value = JSON.stringify(removedMembers);
+        console.log("Removed members input güncellendi:", removedMembersInput.value);
+    }
+
+    function resetRemovedMembers() {
+        removedMembers = [];
+        updateRemovedMembersInput();
+    }
+</script>
+
+    <script>
+
+        
+        function showTab(tabId) {
+    // Tüm sekmeleri gizle
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+
+    // İlgili sekmeyi göster
+    const selectedTab = document.getElementById(tabId);
+    if (selectedTab) {
+        selectedTab.style.display = 'block';
+    }
+}
+        document.addEventListener("DOMContentLoaded", function() {
+        // Modal elementini seçiyoruz
+        const modal = document.getElementById("resultModal");
+        const openModalButton = document.getElementById("openModal");
+        const closeModalButton = document.getElementById("closeModal");
+
+        // Modal'ı açmak için buton
+        openModalButton.onclick = function() {
+            modal.style.display = "block";  // Modal'ı göster
+        }
+
+        // Modal'ı kapatmak için buton
+        closeModalButton.onclick = function() {
+            modal.style.display = "none";  // Modal'ı gizle
+        }
+
+        // Modal dışında bir yere tıklanırsa modal'ı kapat
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";  // Modal'ı gizle
+            }
+        }
+    });
+    function sortTable(tableId, columnIndex) {
+  const table = document.getElementById(tableId);
+  const rows = Array.from(table.rows).slice(1);
+  const isAsc = table.getAttribute("data-sort") !== "asc";
+  table.setAttribute("data-sort", isAsc ? "asc" : "desc");
+
+  rows.sort((a, b) => {
+    const aVal = a.cells[columnIndex].innerText.replace('%', '');
+    const bVal = b.cells[columnIndex].innerText.replace('%', '');
+    return isAsc ? aVal - bVal : bVal - aVal;
+  });
+
+  rows.forEach(row => table.tBodies[0].appendChild(row));
+}
+
+
+    </script>
+
+</body>
+</html>

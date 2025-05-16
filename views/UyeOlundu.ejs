@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Üye Girişi</title>
+    <style>
+        /* CSS still remains the same */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            padding: 15px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .navbar .left,
+        .navbar .right {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar input[type="text"] {
+            padding: 5px;
+            margin-left: 20px;
+            border: none;
+            border-radius: 3px;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .login-container input[type="email"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .login-container button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .login-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .login-container .signup-link {
+            margin-top: 15px;
+            display: block;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .login-container .signup-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="left">
+            <a href="/">Ana Sayfa</a>
+            <a href="/lig-olustur">Lig Oluştur</a>
+            <a href="/lige-katil">Lig'e Katıl</a>
+        <!-- Navbar kodları -->
+    </div>
+    <div class="container">
+        <div class="login-container">
+            <!-- Kullanıcıya "KAYDINIZ BAŞARILI" mesajı görüntüleniyor -->
+            <h2 style="color: green; font-weight: bold;">KAYDINIZ BAŞARILI</h2>
+            <h2>Üye Girişi</h2>
+            <!-- Form için action alanı ve method belirleniyor -->
+            <form id="loginForm" action="/login" method="POST">
+                <input type="email" id="email" name="email" placeholder="E-posta" required><br>
+                <input type="password" id="password" name="password" placeholder="Şifre" required><br>
+                <button type="submit">Giriş Yap</button>
+            </form>
+            <a href="/UyeOl" class="signup-link">Üye değil misiniz? Kayıt olun</a>
+        </div>
+    </div>
+</body>
+</html>

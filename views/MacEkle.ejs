@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Maç Ekle</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-cyan-400 to-teal-600 min-h-screen p-6 font-sans">
+
+  <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg p-6">
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Maç Kadrosu Oluştur</h1>
+    
+    <div class="grid grid-cols-2 gap-6">
+      <!-- Takım 1 -->
+      <div class="bg-gray-100 rounded-xl p-4 relative">
+        <div class="flex justify-between items-center mb-2">
+          <h2 class="text-xl font-semibold text-gray-700">1. Takım</h2>
+          <div class="space-x-2">
+            <button onclick="openAddModal(1)" class="text-green-600 text-xl font-bold">+</button>
+            <button onclick="openRemoveModal(1)" class="text-red-600 text-xl font-bold">−</button>
+          </div>
+        </div>
+        <ul id="team1List" class="space-y-1 text-gray-800 text-lg"></ul>
+      </div>
+
+      <!-- Takım 2 -->
+      <div class="bg-gray-100 rounded-xl p-4 relative">
+        <div class="flex justify-between items-center mb-2">
+          <h2 class="text-xl font-semibold text-gray-700">2. Takım</h2>
+          <div class="space-x-2">
+            <button onclick="openAddModal(2)" class="text-green-600 text-xl font-bold">+</button>
+            <button onclick="openRemoveModal(2)" class="text-red-600 text-xl font-bold">−</button>
+          </div>
+        </div>
+        <ul id="team2List" class="space-y-1 text-gray-800 text-lg"></ul>
+      </div>
+    </div>
+
+    <!-- Kadroları Yayınla -->
+    <form action="/lig/<%= lig._id %>/kadro-yayinla" method="POST" onsubmit="prepareFormData()">
+      <div id="hiddenInputs"></div> <!-- Kadro bilgileri buraya eklenecek -->
+      <div class="mt-10 text-center">
+        <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-xl text-lg shadow-md">
+          Kadroları Yayınla
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modallar -->
+  <div id="modalBackdrop" class="hidden fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-96">
+      <h3 id="modalTitle" class="text-xl font-bold mb-4"></h3>
+      <div id="modalContent" class="space-y-2 max-h-60 overflow-y-auto"></div>
+      <input id="manualInput" type="text" placeholder="Manuel oyuncu ekle" class="w-full mt-4 px-3 py-2 border rounded-md">
+      <div class="flex justify-end space-x-2 mt-4">
+        <button onclick="confirmModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Ekle</button>
+        <button onclick="closeModal()" class="bg-gray-300 px-4 py-2 rounded-lg">İptal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Kodları -->
+  <script>
+    const team1 = [];
+    const team2 = [];
+    const members = ['Eren Pehlivan', 'Baran Kaya', 'Oğuzhan Kadayıf'];
+    let currentTeam = 1;
+    let mode = 'add';
+
+    function openAddModal(team) {
+      currentTeam = team;
+      mode = 'add';
+      document.getElementById('modalTitle').textContent = `Oyuncu Ekle (Takım ${team})`;
+      const content = document.getElementById('modalContent');
+      content.innerHTML = '';
+      members.forEach(member => {
+        if (![...team1, ...team2].includes(member)) {
+          content.innerHTML += `<label class="block"><input type="checkbox" value="${member}" class="modal-checkbox mr-2">${member}</label>`;
+        }
+      });
+      document.getElementById('manualInput').value = '';
+      document.getElementById('modalBackdrop').classList.remove('hidden');
+    }
+
+    function openRemoveModal(team) {
+      currentTeam = team;
+      mode = 'remove';
+      document.getElementById('modalTitle').textContent = `Oyuncu Çıkar (Takım ${team})`;
+      const content = document.getElementById('modalContent');
+      content.innerHTML = '';
+      const currentTeamList = team === 1 ? team1 : team2;
+      currentTeamList.forEach(member => {
+        content.innerHTML += `<label class="block"><input type="checkbox" value="${member}" class="modal-checkbox mr-2">${member}</label>`;
+      });
+      document.getElementById('manualInput').style.display = 'none';
+      document.getElementById('modalBackdrop').classList.remove('hidden');
+    }
+
+    function confirmModal() {
+      const checkboxes = document.querySelectorAll('.modal-checkbox:checked');
+      const names = Array.from(checkboxes).map(cb => cb.value.trim());
+      const manualInput = document.getElementById('manualInput').value.trim();
+      const currentList = currentTeam === 1 ? team1 : team2;
+      const listEl = document.getElementById(`team${currentTeam}List`);
+
+      if (mode === 'add') {
+        names.concat(manualInput ? [manualInput] : []).forEach(name => {
+          if (name && !team1.includes(name) && !team2.includes(name)) {
+            currentList.push(name);
+          }
+        });
+      } else if (mode === 'remove') {
+        names.forEach(name => {
+          const index = currentList.indexOf(name);
+          if (index !== -1) currentList.splice(index, 1);
+        });
+      }
+
+      listEl.innerHTML = currentList.map(n => `<li>• ${n}</li>`).join('');
+      closeModal();
+    }
+
+    function closeModal() {
+      document.getElementById('modalBackdrop').classList.add('hidden');
+      document.getElementById('manualInput').style.display = 'block';
+    }
+
+    function prepareFormData() {
+      const hiddenDiv = document.getElementById('hiddenInputs');
+      hiddenDiv.innerHTML = '';
+
+      team1.forEach(p => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'team1Players[]';
+        input.value = p;
+        hiddenDiv.appendChild(input);
+      });
+
+      team2.forEach(p => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'team2Players[]';
+        input.value = p;
+        hiddenDiv.appendChild(input);
+      });
+    }
+  </script>
+
+</body>
+</html>

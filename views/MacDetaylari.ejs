@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Maç Detayları</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 40px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    .match-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .match-header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .score {
+      font-size: 36px;
+      font-weight: bold;
+      color: #198754;
+    }
+
+    .teams-lineup {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+    }
+
+    .team {
+      width: 45%;
+    }
+
+    .team h3 {
+      text-align: center;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+
+    .player {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .statistics {
+      margin-top: 50px;
+    }
+
+    .statistics h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .goals {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .goals-list {
+      width: 45%;
+    }
+
+    .goals-list ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .goals-list li {
+      padding: 6px 0;
+      font-size: 16px;
+    }
+
+    .match-date {
+      margin-top: 30px;
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+    }
+
+    <style>
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+.back-button:hover {
+  background-color: #3e8e41;
+}
+</style>
+  </style>
+</head>
+<body>
+    <a href="/lig/<%= weeklyMatch.league %>" class="back-button">
+        ← Fikstür Sayfasına Dön
+      </a>
+  <div class="container">
+    <div class="match-header">
+      <h1><%= weeklyMatch.team1Name %> vs <%= weeklyMatch.team2Name %></h1>
+      <div class="score">
+        <%= weeklyMatch.result.team1Score %> - <%= weeklyMatch.result.team2Score %>
+      </div>
+    </div>
+
+    <div class="teams-lineup">
+      <div class="team">
+        <h3><%= weeklyMatch.team1Name %> Kadrosu</h3>
+        <% weeklyMatch.team1Players.forEach(player => { %>
+          <div class="player"><%= player.user.name %> </div>
+        <% }) %>
+      </div>
+      <div class="team">
+        <h3><%= weeklyMatch.team2Name %> Kadrosu</h3>
+        <% weeklyMatch.team2Players.forEach(player => { %>
+          <div class="player"><%= player.user.name %> </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <% 
+    function groupGoals(goals, team) {
+      const grouped = {};
+      goals.filter(g => g.team === team).forEach(g => {
+        const name = g.scorer.name;
+        grouped[name] = (grouped[name] || 0) + 1;
+      });
+      return grouped;
+    }
+    
+    const team1Goals = groupGoals(weeklyMatch.goals, 'team1');
+    const team2Goals = groupGoals(weeklyMatch.goals, 'team2');
+    %>
+    
+    <h2>İstatistikler</h2>
+    <div class="goals">
+      <div class="goals-list">
+        <h4><%= weeklyMatch.team1Name %> Golleri</h4>
+        <ul>
+          <% Object.entries(team1Goals).forEach(([name, count]) => { %>
+            <li><%= name %> - <%= count %> Gol</li>
+          <% }) %>
+        </ul>
+      </div>
+    
+      <div class="goals-list">
+        <h4><%= weeklyMatch.team2Name %> Golleri</h4>
+        <ul>
+          <% Object.entries(team2Goals).forEach(([name, count]) => { %>
+            <li><%= name %> - <%= count %> Gol</li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+
+    <div class="match-date">
+      Maç Tarihi: <%= weeklyMatch.date.toLocaleDateString('tr-TR') %>
+    </div>
+  </div>
+</body>
+</html>

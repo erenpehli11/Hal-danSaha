@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Lig Oluştur</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #1ABC9C, #3498DB, #9B59B6);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
+            color: #fff;
+            opacity: 0.95;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .navbar {
+            background-color: rgba(44, 62, 80, 0.9);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 1.2em;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #E74C3C;
+        }
+
+        .navbar a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #E74C3C;
+            left: 0;
+            bottom: -5px;
+            transition: width 0.3s;
+        }
+
+        .navbar a:hover::after {
+            width: 100%;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            color: #2C3E50;
+        }
+
+        .container h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 2.5em;
+            color: #2C3E50;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+
+        .form-group button {
+            width: 100%;
+            padding: 12px;
+            background-color: #1ABC9C;
+            color: white;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background-color: #16A085;
+        }
+
+        /* Hata ve başarı mesaj kutuları */
+        .message {
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            user-select: none;
+        }
+
+        .error-message {
+            background-color: #e74c3c;
+            color: white;
+            box-shadow: 0 0 15px #c0392b;
+        }
+
+        .success-message {
+            background-color: #2ecc71;
+            color: white;
+            box-shadow: 0 0 15px #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="left">
+            <a href="/AnaSayfa">Ana Sayfa</a>
+            <a href="/LigOlustur">Lig Oluştur</a>
+            <a href="/LigeKatil">Lig'e Katıl</a>
+            <a href="/Liglerim">Liglerim</a>
+        </div>
+        <div class="right">
+            <% if (user) { %>
+                <span><%= user.name %> <%= user.surname %></span>
+                <a href="/CikisYap">Çıkış Yap</a>
+            <% } else { %>
+                <a href="/UyeGirisi">Üye Girişi</a>
+                <a href="/Uyeol">Üye Ol</a>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Lig Oluştur</h1>
+
+        <!-- Mesaj alanı -->
+        <% if (typeof errorMessage !== 'undefined') { %>
+            <div class="message error-message"><%= errorMessage %></div>
+        <% } %>
+
+        <% if (typeof successMessage !== 'undefined') { %>
+            <div class="message success-message"><%= successMessage %></div>
+        <% } %>
+
+        <form action="/LigOlustur" method="POST">
+            <div class="form-group">
+                <label for="name">Lig Adı</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Oluştur</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
