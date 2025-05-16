@@ -1,105 +1,141 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8" />
-    <title>Üye Ol</title>
+    <meta charset="UTF-8">
+    <title>Üye Girişi</title>
     <style>
-        /* Önceki style'lar buraya gelecek (daha öncekiyle uyumlu) */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
+            background: linear-gradient(45deg, #1ABC9C, #3498DB, #9B59B6);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
+            color: #fff;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            height: 100vh;
         }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .navbar {
-            background-color: #007bff;
-            padding: 15px;
-            color: #fff;
+            background-color: rgba(44, 62, 80, 0.9);
+            padding: 20px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
+
         .navbar a {
             color: #fff;
             text-decoration: none;
-            margin: 0 10px;
+            margin: 0 20px;
+            font-size: 1.2em;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
         }
-        .navbar .left,
-        .navbar .right {
+
+        .navbar a:hover {
+            color: #E74C3C;
+        }
+
+        .navbar a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #E74C3C;
+            left: 0;
+            bottom: -5px;
+            transition: width 0.3s;
+        }
+
+        .navbar a:hover::after {
+            width: 100%;
+        }
+
+        .navbar .left, .navbar .right {
             display: flex;
             align-items: center;
         }
+
         .navbar input[type="text"] {
-            padding: 5px;
+            padding: 8px;
             margin-left: 20px;
             border: none;
-            border-radius: 3px;
+            border-radius: 30px;
+            font-size: 1.1em;
         }
+
         .container {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 40px;
         }
-        .signup-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            width: 300px;
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 350px;
             text-align: center;
+            backdrop-filter: blur(10px);
         }
-        .signup-container h2 {
-            margin-bottom: 20px;
-            color: #333;
+
+        .login-container h2 {
+            margin-bottom: 25px;
+            color: #2C3E50;
+            font-size: 2em;
+            font-weight: 700;
         }
-        .signup-container input[type="text"],
-        .signup-container input[type="email"],
-        .signup-container input[type="password"] {
+
+        .login-container input[type="email"],
+        .login-container input[type="password"] {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 8px;
+            font-size: 1em;
             box-sizing: border-box;
-            font-size: 16px;
         }
-        .signup-container button {
-            background-color: #007bff;
+
+        .login-container button {
+            background-color: #1ABC9C;
             color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            font-size: 16px;
+            border-radius: 30px;
+            padding: 12px;
+            font-size: 1.1em;
             cursor: pointer;
             width: 100%;
+            transition: background-color 0.3s;
         }
-        .signup-container button:hover {
-            background-color: #0056b3;
+
+        .login-container button:hover {
+            background-color: #16A085;
         }
-        .signup-container .login-link {
-            margin-top: 15px;
+
+        .login-container .signup-link {
+            margin-top: 20px;
             display: block;
-            color: #007bff;
+            color: #3498DB;
+            font-size: 1em;
             text-decoration: none;
         }
-        .signup-container .login-link:hover {
+
+        .login-container .signup-link:hover {
             text-decoration: underline;
-        }
-        .info-text {
-            font-size: 0.9em;
-            color: #555;
-            margin-bottom: 10px;
-            text-align: left;
-        }
-        .error-message {
-            color: red;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-align: left;
         }
     </style>
 </head>
@@ -107,15 +143,16 @@
     <div class="navbar">
         <div class="left">
             <a href="/">Ana Sayfa</a>
-            <a href="/lig-olustur">Lig Oluştur</a>
-            <a href="/lige-katil">Lig'e Katıl</a>
+            <a href="/UyeGirisi">Lig Oluştur</a>
+            <a href="/UyeGirisi">Lig'e Katıl</a>
         </div>
         <div class="right">
             <a href="/UyeGirisi">Üye Girişi</a>
             <a href="/UyeOl">Üye Ol</a>
-            <input type="text" placeholder="Arama...">
+            
         </div>
     </div>
+   
     <div class="container">
         <div class="signup-container">
             <h2>Üye Ol</h2>
