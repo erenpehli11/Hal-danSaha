@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <title>Üye Girişi</title>
+    <meta charset="UTF-8" />
+    <title>Üye Ol</title>
     <style>
+        /* Üye Girişi sayfasından uyarlanmış arka plan ve font */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
@@ -23,6 +24,7 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* Navbar stilini tamamen aynı yaptım */
         .navbar {
             background-color: rgba(44, 62, 80, 0.9);
             padding: 20px 30px;
@@ -74,6 +76,7 @@
             font-size: 1.1em;
         }
 
+        /* Container ve formun dış görünüşü */
         .container {
             flex: 1;
             display: flex;
@@ -82,7 +85,7 @@
             padding: 40px;
         }
 
-        .login-container {
+        .signup-container {
             background-color: rgba(255, 255, 255, 0.9);
             padding: 40px;
             border-radius: 20px;
@@ -90,17 +93,18 @@
             width: 350px;
             text-align: center;
             backdrop-filter: blur(10px);
+            color: #2C3E50; /* İçerik rengini giriş sayfasıyla uyumlu yaptım */
         }
 
-        .login-container h2 {
+        .signup-container h2 {
             margin-bottom: 25px;
-            color: #2C3E50;
             font-size: 2em;
             font-weight: 700;
         }
 
-        .login-container input[type="email"],
-        .login-container input[type="password"] {
+        .signup-container input[type="text"],
+        .signup-container input[type="email"],
+        .signup-container input[type="password"] {
             width: 100%;
             padding: 12px;
             margin-bottom: 15px;
@@ -110,7 +114,7 @@
             box-sizing: border-box;
         }
 
-        .login-container button {
+        .signup-container button {
             background-color: #1ABC9C;
             color: #fff;
             border: none;
@@ -122,11 +126,11 @@
             transition: background-color 0.3s;
         }
 
-        .login-container button:hover {
+        .signup-container button:hover {
             background-color: #16A085;
         }
 
-        .login-container .signup-link {
+        .signup-container .login-link {
             margin-top: 20px;
             display: block;
             color: #3498DB;
@@ -134,8 +138,22 @@
             text-decoration: none;
         }
 
-        .login-container .signup-link:hover {
+        .signup-container .login-link:hover {
             text-decoration: underline;
+        }
+
+        .info-text {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: left;
         }
     </style>
 </head>
@@ -143,16 +161,14 @@
     <div class="navbar">
         <div class="left">
             <a href="/">Ana Sayfa</a>
-            <a href="/UyeGirisi">Lig Oluştur</a>
-            <a href="/UyeGirisi">Lig'e Katıl</a>
+            <a href="/lig-olustur">Lig Oluştur</a>
+            <a href="/lige-katil">Lig'e Katıl</a>
         </div>
         <div class="right">
             <a href="/UyeGirisi">Üye Girişi</a>
             <a href="/UyeOl">Üye Ol</a>
-            
         </div>
     </div>
-   
     <div class="container">
         <div class="signup-container">
             <h2>Üye Ol</h2>
@@ -168,7 +184,6 @@
 
                 <div id="error" class="error-message" style="display:none;"></div>
 
-                <!-- Doğrulama kodu inputu, başlangıçta gizli -->
                 <input type="text" id="verificationCode" name="verificationCode" placeholder="E-posta doğrulama kodu" style="display:none;"><br>
 
                 <button type="submit" id="submitBtn">Kayıt Ol</button>
@@ -204,7 +219,6 @@
             errorDiv.style.display = 'none';
         }
 
-        // Doğrulama kodu gönderilmemişse önce kod gönder
         if (!isCodeSent) {
             fetch('/send-verification-code', {
                 method: 'POST',
@@ -216,14 +230,14 @@
             .then(res => res.json())
             .then(data => {
                 if (data.message?.includes("Doğrulama kodu e-postanıza gönderildi")) {
-    isCodeSent = true;
+                    isCodeSent = true;
 
-    verificationCodeInput.style.display = 'block';
-    verificationCodeInput.setAttribute('required', true); // <--- Burası önemli
+                    verificationCodeInput.style.display = 'block';
+                    verificationCodeInput.setAttribute('required', true);
 
-    submitBtn.textContent = 'Doğrula ve Kayıt Ol';
-    errorDiv.style.display = 'none';
-}else {
+                    submitBtn.textContent = 'Doğrula ve Kayıt Ol';
+                    errorDiv.style.display = 'none';
+                } else {
                     errorDiv.style.display = 'block';
                     errorDiv.textContent = data.message || 'Doğrulama kodu gönderilirken hata oluştu.';
                 }
@@ -235,7 +249,6 @@
             return;
         }
 
-        // Kod gönderildiyse ve kullanıcı kodu girdiyse verify-code endpoint'ine gönder
         if (isCodeSent && verificationCode !== '') {
             fetch('/verify-code', {
                 method: 'POST',
@@ -248,7 +261,7 @@
             .then(data => {
                 if (data.message?.includes("Kayıt başarılı")) {
                     alert("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz.");
-                    window.location.href = "/UyeGirisi"; // Kayıt sonrası yönlendirme
+                    window.location.href = "/UyeGirisi";
                 } else {
                     errorDiv.style.display = 'block';
                     errorDiv.textContent = data.message || 'Doğrulama başarısız.';
@@ -256,13 +269,11 @@
             })
             .catch(() => {
                 errorDiv.style.display = 'block';
-                errorDiv.textContent = 'Sunucuya bağlanırken hata oluştu.';
+                errorDiv.textContent = 'Doğrulama işlemi sırasında hata oluştu.';
             });
-        } else {
-            errorDiv.style.display = 'block';
-            errorDiv.textContent = 'Lütfen e-posta doğrulama kodunu giriniz.';
         }
     });
 </script>
+
 </body>
 </html>
