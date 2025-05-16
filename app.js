@@ -47,9 +47,4 @@ app.use('/Lig/:id' , pageRoute)
 
 
 
-<<<<<<< HEAD
-=======
-app.listen(port, ()=> {
-    console.log('Application running on port:' + port);
-});
->>>>>>> a6580254c63913ab093fd0b3cd5bc915a86d177b
+
