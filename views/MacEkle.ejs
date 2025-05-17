@@ -65,7 +65,7 @@
  const team1 = [];
   const team2 = [];
 
-  const members = <%- JSON.stringify(lig.members.map(m => m.name)) %>;
+  const members = <%- JSON.stringify(lig.members.map(m => `${m.name} ${m.surname}`)) %>;
 
   let currentTeam = 1;
   let mode = 'add';

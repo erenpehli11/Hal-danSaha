@@ -76,8 +76,8 @@ const getLeagueDetails = async (req, res) => {
 
     // --- WINNER İSTATİSTİKLERİ ---
     const winnerStats = lig.members.map(user => {
-      const userWeeklyMatches = weeklyMatchList.filter(weeklyMatch =>
-        [...weeklyMatch.team1Players, ...weeklyMatch.team2Players].some(p => p.user.equals(user._id))
+      const userWeeklyMatches = weeklyMatchList.filter(match =>
+        [...match.team1Players, ...match.team2Players].some(p => p.user?.toString() === user._id.toString())
       );
 
       const wins = user.wins || 0;
@@ -88,23 +88,20 @@ const getLeagueDetails = async (req, res) => {
         name: user.name,
         wins,
         matchCount,
-        winRate
+        winRate: parseFloat(winRate)
       };
     }).sort((a, b) => b.wins - a.wins);
 
-    
 
     // --- GOL İSTATİSTİKLERİ ---
     const goalStats = lig.members.map(user => {
       const userWeeklyGoals = user.goals?.weekly?.filter(g =>
-        weeklyMatchList.some(weeklyMatch => weeklyMatch._id.equals(g.matchId))
+        weeklyMatchList.some(match => match._id.toString() === g.matchId?.toString())
       ) || [];
 
       const totalGoals = userWeeklyGoals.reduce((acc, g) => acc + (g.goals || 0), 0);
       const totalMatches = userWeeklyGoals.length;
       const avgGoals = totalMatches > 0 ? (totalGoals / totalMatches).toFixed(2) : "0.00";
-
-    
 
       return {
         name: user.name,
@@ -112,8 +109,8 @@ const getLeagueDetails = async (req, res) => {
         totalMatches,
         avgGoals: parseFloat(avgGoals)
       };
-    }).sort((a, b) => b.totalGoals - a.totalGoals)
-      .slice(0, 7); // En çok gol atan ilk 7
+    }).sort((a, b) => b.totalGoals - a.totalGoals);
+   // En çok gol atan ilk 7 oyuncu
 
     // --- HAFTANIN MAÇI ---
     const weeklyMatch = await WeeklyMatch.findOne({ league: leagueId })
@@ -121,28 +118,16 @@ const getLeagueDetails = async (req, res) => {
       .populate('team2Players.user')
       .sort({ date: -1 });
 
-    if (!weeklyMatch) {
-      return res.render("LigDetaylari", {
-        lig,
-        weeklyMatchList,
-        weeklyMatch: null,
-        message: "Bu haftaki maç bilgileri henüz yayınlanmadı.",
-        user: req.user,
-        userId,
-        goalStats,
-        winnerStats
-      });
-    }
-
     // --- SAYFAYI GÖNDER ---
     res.render("LigDetaylari", {
       lig,
       weeklyMatchList,
-      weeklyMatch,
+      weeklyMatch: weeklyMatch || null,
       user: req.user,
       userId,
       goalStats,
-      winnerStats
+      winnerStats,
+      message: weeklyMatch ? null : "Bu haftaki maç bilgileri henüz yayınlanmadı."
     });
 
   } catch (error) {

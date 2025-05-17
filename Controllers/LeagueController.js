@@ -70,12 +70,12 @@ const joinLeague = async (req, res) => {
         }
 
         // Kullanıcıyı lig üyeleri arasına ekle
-        if (league.members.includes(userId)) {
-           return res.render('LigeKatil', {
-                user: req.user,
-                errorMessage: 'Zaten bu lige katıldınız.'
-            });
-        }
+        if (league.members.some(memberId => memberId.equals(userId))) {
+    return res.render('LigeKatil', {
+        user: req.user,
+        errorMessage: 'Zaten bu lige katıldınız.'
+    });
+}
 
         // Kullanıcıyı lig üyelerine ekle
         league.members.push(userId);
@@ -103,94 +103,82 @@ const joinLeague = async (req, res) => {
 
 
 const createMatch = async (req, res) => {
-    const { team1Players, team2Players } = req.body; // Formdan gelen verileri alıyoruz
-    const ligId = req.params.id;
-  
-    try {
-      // Lig bilgisini alalım
-      const league = await League.findById(ligId);
-      if (!league) {
-        return res.status(404).send('Lig bulunamadı.');
-      }
-  
-      // Team1 oyuncuları için ID'leri ve pozisyonları bulalım
-      const team1PlayerObjects = [];
+  const { team1Players, team2Players } = req.body;
+  const ligId = req.params.id;
 
-      for (let i = 0; i < team1Players.length; i++) {
-        const fullName = team1Players[i]; // Örn: "Ahmet Yılmaz"
-        const [name, ...surnameParts] = fullName.trim().split(" ");
-        const surname = surnameParts.join(" "); // Birden fazla soyisim varsa da çalışsın
-      
-        let user = await User.findOne({ name: name, surname: surname });
-      
-        if (!user) {
-          user = await User.create({
-            name,
-            isGuest: true // misafir olarak işaretle
-          });
-        
-          // Lig üyelerine misafiri ekle
-          league.members.push(user._id);
-          await league.save();
-        
-          // Misafir user'ın liglerini güncelle
-          user.leagues.push(league._id);
-          await user.save(); // ← bunu eklemen gerekiyordu
-        }
-        team1PlayerObjects.push({
-          user: user._id
-        });
-      }
-  
-      // Team2 oyuncuları için ID'leri ve pozisyonları bulalım
-      const team2PlayerObjects = [];
+  try {
+    const league = await League.findById(ligId);
+    if (!league) return res.status(404).send('Lig bulunamadı.');
 
-      for (let i = 0; i < team2Players.length; i++) {
-        const fullName = team2Players[i]; // Örn: "Ahmet Yılmaz"
-        const [name, ...surnameParts] = fullName.trim().split(" ");
-        const surname = surnameParts.join(" "); // Birden fazla soyisim varsa da çalışsın
-      
-        let user = await User.findOne({ name: name, surname: surname });
-      
-        if (!user) {
-          user = await User.create({
-            name,
-            isGuest: true // misafir olarak işaretle
-          });
-        
-          // Lig üyelerine misafiri ekle
-          league.members.push(user._id);
-          await league.save();
-        
-          // Misafir user'ın liglerini güncelle
-          user.leagues.push(league._id);
-          await user.save(); // ← bunu eklemen gerekiyordu
-        }
-        team2PlayerObjects.push({
-          user: user._id
-        });
-      }
-  
-      // WeeklyMatch verisini oluştur
-      const weeklyMatch = new WeeklyMatch({
-        league: league._id,
-        team1Players: team1PlayerObjects,  // Array of Player objects
-        team2Players: team2PlayerObjects,  // Array of Player objects
-        matchDate: new Date(),
-      });
-  
-      // WeeklyMatch'i kaydet
-      await weeklyMatch.save();
-  
-      // Maç sayfasına yönlendir
-      res.redirect(`/lig/${ligId}`);
-  
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Bir hata oluştu.');
+    // Kullanıcıyı bulur ya da guest olarak oluşturur ve ilişkilendirir
+   const findOrCreateUser = async (fullName) => {
+  const nameParts = fullName.trim().split(" ");
+  const name = nameParts[0];
+  let surname = nameParts.slice(1).join(" ").trim();
+
+  // Geçersiz soyadları normalize et
+  if (!surname || surname.toLowerCase() === "undefined") {
+    surname = ""; // tüm boş/undefined soyadlar böyle tutulacak
+  }
+
+  // User'ı bulmaya çalış (name + boş veya eşleşen surname ile)
+  let user = await User.findOne({
+    name,
+    surname
+  });
+
+  if (!user) {
+    // Kullanıcı yoksa guest olarak oluştur
+    user = await User.create({
+      name,
+      surname,
+      isGuest: true
+    });
+  }
+
+  // Lige üye değilse ekle (tekrarı önler)
+  await League.findByIdAndUpdate(user.leagues.includes(league._id) ? null : league._id, {
+    $addToSet: { members: user._id }
+  });
+
+  // Kullanıcının lig listesine bu ligi ekle
+  await User.findByIdAndUpdate(user._id, {
+    $addToSet: { leagues: league._id }
+  });
+
+  return user;
+};
+
+    // Takım 1 oyuncuları
+    const team1PlayerObjects = [];
+    for (const fullName of team1Players) {
+      const user = await findOrCreateUser(fullName);
+      team1PlayerObjects.push({ user: user._id });
     }
-  };
 
+    // Takım 2 oyuncuları
+    const team2PlayerObjects = [];
+    for (const fullName of team2Players) {
+      const user = await findOrCreateUser(fullName);
+      team2PlayerObjects.push({ user: user._id });
+    }
+
+    // Haftalık maç oluştur
+    const weeklyMatch = new WeeklyMatch({
+      league: league._id,
+      team1Players: team1PlayerObjects,
+      team2Players: team2PlayerObjects,
+      matchDate: new Date(),
+    });
+
+    await weeklyMatch.save();
+
+    res.redirect(`/lig/${ligId}`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Bir hata oluştu.');
+  }
+};
   const enterResults = async (req, res) => {
     try {
       const { team1TotalGoals, team2TotalGoals } = req.body;
@@ -316,24 +304,6 @@ const createMatch = async (req, res) => {
 };
   
 
-const getAddMatchPage = async (req, res) => {
-  try {
-    const ligId = req.params.id;
-    const lig = await Lig.findById(ligId).populate('members'); // üyeleri getir
-
-    if (!lig) {
-      return res.status(404).send('Lig bulunamadı');
-    }
-
-    res.render('MacEkle', {
-      lig,                // tüm lig objesini geçebilirsin
-      members: lig.members // veya sadece üyeleri doğrudan da geçebilirsin
-    });
-  } catch (err) {
-    console.error('Sayfa yüklenirken hata oluştu:', err);
-    res.status(500).send('Bir hata oluştu.');
-  }
-};
 
 
 
@@ -342,4 +312,5 @@ const getAddMatchPage = async (req, res) => {
 
 
 
-export { createLeague , joinLeague  , createMatch , enterResults , editLeague , getAddMatchPage};
+
+export { createLeague , joinLeague  , createMatch , enterResults , editLeague};

@@ -414,59 +414,68 @@
             <% }) %>
           </div>
           <div id="statistics" class="tab-content" style="display: none;">
-            <div class="stats-container">
-              
-              <!-- Gol Krallığı -->
-              <div class="stats-column">
-                <h3>⚽ Gol Krallığı</h3>
-                <table id="goalStats">
-                  <thead>
-                    <tr>
-                      <th onclick="sortTable('goalStatsTable', 0)">Oyuncu</th>
-                      <th onclick="sortTable('goalStatsTable', 1)">Maç</th>
-                      <th onclick="sortTable('goalStatsTable', 2)">Gol</th>
-                      <th onclick="sortTable('goalStatsTable', 3)">Gol Ort.</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <% goalStats.forEach(user => { %>
-                      <tr>
-                        <td><%= user.name %></td>
-                        <td><%= user.totalMatches %></td>
-                        <td><%= user.totalGoals %></td>
-                        <td><%= (user.totalGoals / user.totalMatches).toFixed(2) %></td>
-                      </tr>
-                    <% }) %>
-                  </tbody>
-                </table>
-              </div>
-          
-              <!-- Winner Sıralaması -->
-              <div class="stats-column">
-                <h3>🏆 Winner Sıralaması</h3>
-                <table id="winnerStatsTable">
-                  <thead>
-                    <tr>
-                      <th onclick="sortTable('winnerStatsTable', 0)">Oyuncu</th>
-                      <th onclick="sortTable('winnerStatsTable', 1)">Kazanç</th>
-                      <th onclick="sortTable('winnerStatsTable', 2)">Maç</th>
-                      <th onclick="sortTable('winnerStatsTable', 3)">Oran</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <% winnerStats.forEach(user => { %>
-                      <tr>
-                        <td><%= user.name %></td>
-                        <td><%= user.wins %></td>
-                        <td><%= user.matchCount %></td>
-                        <td><%= ((user.wins / user.matchCount) * 100).toFixed(1) %>%</td>
-                      </tr>
-                    <% }) %>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+  <div class="stats-container">
+    
+    <!-- Gol Krallığı -->
+    <div class="stats-column">
+      <h3>⚽ Gol Krallığı</h3>
+      <table id="goalStatsTable"> <!-- düzeltildi -->
+        <thead>
+          <tr>
+            <th onclick="sortTable('goalStatsTable', 0)">Oyuncu</th>
+            <th onclick="sortTable('goalStatsTable', 1)">Maç</th>
+            <th onclick="sortTable('goalStatsTable', 2)">Gol</th>
+            <th onclick="sortTable('goalStatsTable', 3)">Gol Ort.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% goalStats.forEach(user => { %>
+            <tr>
+              <td><%= user.name %></td>
+              <td><%= user.totalMatches %></td>
+              <td><%= user.totalGoals %></td>
+              <td>
+                <%= user.totalMatches > 0 
+                  ? (user.totalGoals / user.totalMatches).toFixed(2) 
+                  : "0.00" %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Winner Sıralaması -->
+    <div class="stats-column">
+      <h3>🏆 Winner Sıralaması</h3>
+      <table id="winnerStatsTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable('winnerStatsTable', 0)">Oyuncu</th>
+            <th onclick="sortTable('winnerStatsTable', 1)">Kazanç</th>
+            <th onclick="sortTable('winnerStatsTable', 2)">Maç</th>
+            <th onclick="sortTable('winnerStatsTable', 3)">Oran</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% winnerStats.forEach(user => { %>
+            <tr>
+              <td><%= user.name %></td>
+              <td><%= user.wins %></td>
+              <td><%= user.matchCount %></td>
+              <td>
+                <%= user.matchCount > 0 
+                  ? ((user.wins / user.matchCount) * 100).toFixed(1) + "%" 
+                  : "0%" %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
         <div id="members" class="tab-content" style="display: none;">
     <h3>Kişiler</h3>
     <div class="member-list">
@@ -498,16 +507,24 @@
                         <h3>Takım 1</h3>
                         <ul>
                             <% weeklyMatch.team1Players.forEach(p => { %>
-                                <li><%= p.user.name %></li>
-                            <% }) %>
+                              <% if (p.user) { %>
+        <li><%= p.user.name %></li>
+    <% } else { %>
+        <li><em>Silinmiş kullanıcı</em></li>
+    <% } %>
+<% }) %>
                         </ul>
                     </div>
                     <div class="team-box">
                         <h3>Takım 2</h3>
                         <ul>
                             <% weeklyMatch.team2Players.forEach(p => { %>
-                                <li><%= p.user.name %></li>
-                            <% }) %>
+                                <% if (p.user) { %>
+        <li><%= p.user.name %></li>
+    <% } else { %>
+        <li><em>Silinmiş kullanıcı</em></li>
+    <% } %>
+<% }) %>
                         </ul>
                     </div>
                 </div>
