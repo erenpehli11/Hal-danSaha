@@ -478,19 +478,25 @@
 </div>
         <div id="members" class="tab-content" style="display: none;">
     <h3>Kişiler</h3>
-    <div class="member-list">
-        <% lig.members.forEach(member => { %>
-            <div class="member-card">
-                <div class="member-avatar">
+<div class="member-list">
+    <% lig.members.forEach(member => { %>
+        <div class="member-card">
+            <div class="member-avatar">
+                <% if (member.name === "Ayse" && member.surname === "Sancar") { %>
+                    <i class="fas fa-heart" style="color: red;"></i>
+                <% } else { %>
                     <i class="fas fa-user-circle"></i>
-                </div>
-                <div class="member-info">
-                    <span class="member-name"><%= member.name %> <%= member.surname %></span>
-                </div>
+                <% } %>
             </div>
-        <% }) %>
-    </div>
+            <div class="member-info">
+                <span class="member-name"><%= member.name %> <%= member.surname %></span>
+            </div>
+        </div>
+    <% }) %>
 </div>
+
+
+
 
 <div id="weekly" class="tab-content" >
 
